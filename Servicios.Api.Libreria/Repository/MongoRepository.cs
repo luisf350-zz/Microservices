@@ -21,14 +21,40 @@ namespace Servicios.Api.Libreria.Repository
             _collection = db.GetCollection<TDocument>(GetCollectionName(typeof(TDocument)));
         }
 
-        private protected string GetCollectionName(Type documentType)
-        {
-            return ((BsonCollectionAttribute)documentType.GetCustomAttributes(typeof(BsonCollectionAttribute), true).FirstOrDefault()).CollectionName;
-        }
-
         public async Task<IEnumerable<TDocument>> GetAll()
         {
             return await _collection.Find(x => true).ToListAsync();
+        }
+
+        public async Task<TDocument> GetById(string id)
+        {
+            var filter = Builders<TDocument>.Filter.Eq(x => x.Id, id);
+
+            return await _collection.Find(filter).FirstOrDefaultAsync();
+        }
+
+        public async Task InsertDocument(TDocument document)
+        {
+            await _collection.InsertOneAsync(document);
+        }
+
+        public async Task UpdateDocument(TDocument document)
+        {
+            var filter = Builders<TDocument>.Filter.Eq(x => x.Id, document.Id);
+
+            await _collection.FindOneAndReplaceAsync(filter, document);
+        }
+
+        public async Task DeleteById(string id)
+        {
+            var filter = Builders<TDocument>.Filter.Eq(x => x.Id, id);
+
+            await _collection.DeleteOneAsync(filter);
+        }
+
+        private protected string GetCollectionName(Type documentType)
+        {
+            return ((BsonCollectionAttribute)documentType.GetCustomAttributes(typeof(BsonCollectionAttribute), true).FirstOrDefault()).CollectionName;
         }
     }
 }
