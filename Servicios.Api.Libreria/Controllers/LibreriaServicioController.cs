@@ -10,19 +10,30 @@ namespace Servicios.Api.Libreria.Controllers
     [ApiController]
     public class LibreriaServicioController : ControllerBase
     {
-        private readonly IAutorRepository _autorRepository;
+        private readonly IMongoRepository<Autor> _autorRepository;
+        private readonly IMongoRepository<Empleado> _empleadoRepository;
 
-        public LibreriaServicioController(IAutorRepository autorRepository)
+
+        public LibreriaServicioController(IMongoRepository<Autor> autorRepository, IMongoRepository<Empleado> empleadoRepository)
         {
             _autorRepository = autorRepository;
+            _empleadoRepository = empleadoRepository;
         }
 
         [HttpGet("autores")]
         public async Task<ActionResult<IEnumerable<Autor>>> GetAutores()
         {
-            var autores = await _autorRepository.GetAutores();
+            var autores = await _autorRepository.GetAll();
 
             return Ok(autores);
+        }
+
+        [HttpGet("empleados")]
+        public async Task<ActionResult<IEnumerable<Empleado>>> GetEmpleados()
+        {
+            var empleados = await _empleadoRepository.GetAll();
+
+            return Ok(empleados);
         }
     }
 }

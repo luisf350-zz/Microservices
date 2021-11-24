@@ -32,6 +32,7 @@ namespace Servicios.Api.Libreria
 
             services.AddTransient<IAutorContext, AutorContext>();
             services.AddTransient<IAutorRepository, AutorRepository>();
+            services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
