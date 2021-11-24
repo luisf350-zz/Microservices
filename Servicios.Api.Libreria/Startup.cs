@@ -31,7 +31,6 @@ namespace Servicios.Api.Libreria
             services.AddSingleton<MongoSettings>();
 
             services.AddTransient<IAutorContext, AutorContext>();
-            services.AddTransient<IAutorRepository, AutorRepository>();
             services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
 
             services.AddControllers();

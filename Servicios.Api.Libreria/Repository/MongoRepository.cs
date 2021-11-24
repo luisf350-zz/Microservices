@@ -5,6 +5,7 @@ using Servicios.Api.Libreria.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Servicios.Api.Libreria.Repository
@@ -52,9 +53,47 @@ namespace Servicios.Api.Libreria.Repository
             await _collection.DeleteOneAsync(filter);
         }
 
+        public async Task<PaginationEntity<TDocument>> PaginationByFilter(PaginationEntity<TDocument> pagination)
+        {
+            long totalDocuments = 0;
+            var sort = pagination.SortDirection == "desc" ?
+                Builders<TDocument>.Sort.Descending(pagination.Sort) :
+                Builders<TDocument>.Sort.Ascending(pagination.Sort);
+
+            if (pagination.FilterValue == null)
+            {
+                pagination.Data = await _collection.Find(x => true)
+                    .Sort(sort)
+                    .Skip((pagination.Page - 1) * pagination.PageSize)
+                    .Limit(pagination.PageSize)
+                    .ToListAsync();
+
+                totalDocuments = await _collection.CountDocumentsAsync(FilterDefinition<TDocument>.Empty);
+            }
+            else
+            {
+                var valueFilter = ".*" + pagination.FilterValue.Valor + ".*";
+                var filter = Builders<TDocument>.Filter.Regex(pagination.FilterValue.Priopiedad, new MongoDB.Bson.BsonRegularExpression(valueFilter, "i"));
+                pagination.Data = await _collection.Find(filter)
+                    .Sort(sort)
+                    .Skip((pagination.Page - 1) * pagination.PageSize)
+                    .Limit(pagination.PageSize)
+                    .ToListAsync();
+
+                totalDocuments = await _collection.CountDocumentsAsync(filter);
+            }
+
+            var rounded = Math.Ceiling(totalDocuments / Convert.ToDecimal(pagination.PageSize));
+            pagination.PageQuantity = Convert.ToInt32(rounded);
+
+            return pagination;
+        }
+
+        #region Private Methods
         private protected string GetCollectionName(Type documentType)
         {
             return ((BsonCollectionAttribute)documentType.GetCustomAttributes(typeof(BsonCollectionAttribute), true).FirstOrDefault()).CollectionName;
         }
+        #endregion
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Servicios.Api.Libreria.Core.Entities;
+using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Servicios.Api.Libreria.Repository
@@ -11,5 +13,6 @@ namespace Servicios.Api.Libreria.Repository
         Task InsertDocument(TDocument document);
         Task UpdateDocument(TDocument document);
         Task DeleteById(string id);
+        Task<PaginationEntity<TDocument>> PaginationByFilter(PaginationEntity<TDocument> pagination);
     }
 }

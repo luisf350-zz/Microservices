@@ -48,5 +48,11 @@ namespace Servicios.Api.Libreria.Controllers
         {
             await _autorRepository.DeleteById(id);
         }
+
+        [HttpPost("pagination")]
+        public async Task<ActionResult<PaginationEntity<Autor>>> Pagination(PaginationEntity<Autor> pagination)
+        {
+            return await _autorRepository.PaginationByFilter(pagination);
+        }
     }
 }
