@@ -38,6 +38,14 @@ namespace Servicios.Api.Libreria
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Servicios.Api.Libreria", Version = "v1" });
             });
+
+            services.AddCors(opt =>
+            {
+                opt.AddPolicy("All", rule =>
+                {
+                    rule.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,6 +59,7 @@ namespace Servicios.Api.Libreria
             }
 
             app.UseRouting();
+            app.UseCors("All");
 
             app.UseAuthorization();
 
